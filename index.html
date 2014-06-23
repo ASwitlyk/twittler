@@ -1,28 +1,178 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Andrew's Twittler</title>
+    <!-- JQuery -->
     <script src="jquery.js"></script>
+    <!-- Data Generator Script -->
     <script src="data_generator.js"></script>
+
+    <!-- Boot Strap CSS -->
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+
   </head>
   <body>
-    <!-- add comment -->
+
+      <header class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+
+        <div class="container">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="http://www.hackreactor.com/">Project Name</a>
+          </div>
+
+          <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="#">Home</a></li>
+              <li><a href="#">Time Line</a></li>
+              <li><a href="#">About</a></li>
+            </ul>
+          </div> <!-- /. nav-collapse -->
+        </div>
+      </header>
+
+      <div id="container" class="container">
+
+        <div id="content" class="content">
+
+          <h1 class="text-center">Tweets</h1>
+
+          <h2>Tweets Here</h2><button name="newtweets" id="newtweets">New Tweets</button>
+
+          <div id="tweets">
+
+          </div>
+
+
+
+        </div><!-- Close of content -->
+      </div> <!-- Close of container -->
+    
     <script>
 
       $(document).ready(function(){
         var $body = $('body');
-        $body.html('');
+        var $tweets = $('#tweets');
+      //   $body.html('');
 
-        var index = streams.home.length - 1;
+        
+
+        var index = streams.home.length - 1,
+            last_tweet_index = streams.home.length - 1; // for newtweet2 function  
+
+        var last_tweet_message = streams.home[index]['message'];  //chance of two identical messages is low
+        var last_displayed_message;  // to store last displayed message
         while(index >= 0){
           var tweet = streams.home[index];
           var $tweet = $('<div></div>');
-          $tweet.text('@' + tweet.user + ': ' + tweet.message);
-          $tweet.appendTo($body);
+          $tweet.html('@' + tweet.user + ': ' + tweet.message + '<br/> tweeted at: ' + tweet.created_at);
+          $tweet.appendTo($tweets);
           index -= 1;
         }
 
-      });
+        /* function will return an array with all of the new tweets up to the last tweet displayed. The function requires the global last_tweet_message variable and will update the variable to the last message in the return array. Return array is an array of
+        objects which contains the following properties: created_at, message, user
 
-    </script>
+        *************************** Could use streams.home[index] as placeholder for tweets displayed and new tweets instead of messages, 
+        potentially change to this method in case people repost the same message over and over, it would not be redisplayed ************
+        
+        var newTweets = function() { 
+
+          new_tweets = [];
+          var index = streams.home.length - 1,
+              index2 = streams.home.length - 1;  // need two index variables with length of streams.home since two loops rely
+                                                        // upon iterating through them and modifying them
+          var last_tweet_index = null;
+          do {
+            if(streams.home[index]['message'] === last_tweet_message) {
+              last_tweet_index = index;
+            }
+            index--;
+
+          } while(last_tweet_index === null || index >= 0);
+          // modify last_tweet_message variable to new last tweet since function relys upon this outside variable for the last tweet
+          // currently being displayed to the user
+          last_tweet_message = streams.home[index2]['message'];
+
+          if(last_tweet_index != null && last_tweet_message != last_displayed_message) { // to prevent re-displaying the same message 
+
+            // reset last_displayed_message to the new most recent message
+            last_displayed_message = last_tweet_message;  
+
+            while(index2 >= last_tweet_index) {
+              new_tweets.push(streams.home[index2])
+              index2--;
+            }
+
+          }  // End of last_tweet_index != null && last_tweet_message != last_displayed_message IF
+
+          return new_tweets;  // returns an array of objects with created_at, message, and user as properties.
+                              // array organized with most recent tweets first, so index 0 is most recent tweet
+
+        }  // End of newTweets function
+
+        */
+
+
+        var newTweets2 = function() {
+
+          new_tweets= [];
+          var index = streams.home.length - 1,
+              new_lasttweet = streams.home.length;
+
+          if(index >= last_tweet_index) {
+             while(index >= last_tweet_index) {
+                new_tweets.push(streams.home[index]); //push newest messages first into new_tweets array
+                index--;
+             } // end of while loop
+
+             last_tweet_index = new_lasttweet; // set new last_tweet_index to be the next index you expect the new tweet to appear in 
+                                               //(the last index of streams.home + 1)
+
+          } else {
+            return new_tweets; // return empty array (no new messages)
+          }
+
+          return new_tweets;
+
+        } // end of newTweet2 function
+
+        // When click newtweets button, fun newTweets function and get an array with all the new tweets and then display them
+        $('#newtweets').click(function(){
+          var tweetarray = newTweets2();
+          console.log(tweetarray);
+          if(tweetarray.length > 0) {  // there are new tweets, tweetarray organized from newest tweets to oldest.
+              var index = tweetarray.length - 1;
+              while(index >= 0) {
+                var tweet = tweetarray[index]; // tweet is object
+                var $tweet = $('<div></div>');
+                $tweet.html('@' + tweet.user + ': ' + tweet.message + '<br/> tweeted at: ' + tweet.created_at);
+                $tweet.prependTo($tweets);
+                index--;
+              } // end of while loop
+            } // end of tweetarray.length > 0 IF
+           
+        }); // end of click(anonymous function)
+
+
+
+      });  // End of $(document).ready(function)
+
+    </script>  
+
+    <!-- Bootstrap plugins -->
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
   </body>
 </html>
