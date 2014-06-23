@@ -8,6 +8,8 @@
     <title>Andrew's Twittler</title>
     <!-- JQuery -->
     <script src="jquery.js"></script>
+    <!--JQuery timeago plugin -->
+    <script type="text/javascript" src="js/jquery.timeago.js"></script>
     <!-- Data Generator Script -->
     <script src="data_generator.js"></script>
 
@@ -48,7 +50,11 @@
         <div id="content" class="content">
 
           <div class="row">
-            <div class="col-md-3 user"><h2>User</h2></div>
+            <div class="col-md-3 user"><h2>User</h2>
+              
+              <abbr class="timeago" title="Jun 23, 2014T14:04:45">Jun 23, 2014T14:04:45</abbr>
+           
+            </div>
 
             <div class="col-md-6 tweet-container">
               <div class="row" style="margin-top: 10px; margin-bottom: 10px">
@@ -69,11 +75,9 @@
     <script>
 
       $(document).ready(function(){
+
         var $body = $('body');
         var $tweets = $('#tweets');
-      //   $body.html('');
-
-        
 
         var index = streams.home.length - 1,
             last_tweet_index = streams.home.length - 1; // for newtweet2 function  
@@ -82,55 +86,15 @@
         var last_displayed_message;  // to store last displayed message
         while(index >= 0){
           var tweet = streams.home[index];
+          var tweet_date = tweet['created_at'];
+          var utc_tweet = (tweet_date.getUTCMonth() + 1) + ' ' + tweet_date.getUTCDate() + ', ' + tweet_date.getUTCFullYear() + 'T' + tweet_date.getHours() + ':' + tweet_date.getUTCMinutes() + ':' + tweet_date.getUTCSeconds();
           var $tweet = $('<div class="panel panel-default"></div>');
-          $tweet.html('<div class="panel-heading">@' + '<strong>' + tweet.user + '</strong> - ' +tweet.created_at + '</div>' + '<div class="panel-body tweet">' + tweet.message + '</div>');
+          $tweet.html('<div class="panel-heading">@' + '<strong>' + tweet.user + '</strong> - <abbr class="timeago" title="'+utc_tweet+'">' + utc_tweet + '</abbr></div>' + '<div class="panel-body tweet">' + tweet.message + '</div>');
           $tweet.appendTo($tweets);
           index -= 1;
         }
-
-        /* function will return an array with all of the new tweets up to the last tweet displayed. The function requires the global last_tweet_message variable and will update the variable to the last message in the return array. Return array is an array of
-        objects which contains the following properties: created_at, message, user
-
-        *************************** Could use streams.home[index] as placeholder for tweets displayed and new tweets instead of messages, 
-        potentially change to this method in case people repost the same message over and over, it would not be redisplayed ************
-        
-        var newTweets = function() { 
-
-          new_tweets = [];
-          var index = streams.home.length - 1,
-              index2 = streams.home.length - 1;  // need two index variables with length of streams.home since two loops rely
-                                                        // upon iterating through them and modifying them
-          var last_tweet_index = null;
-          do {
-            if(streams.home[index]['message'] === last_tweet_message) {
-              last_tweet_index = index;
-            }
-            index--;
-
-          } while(last_tweet_index === null || index >= 0);
-          // modify last_tweet_message variable to new last tweet since function relys upon this outside variable for the last tweet
-          // currently being displayed to the user
-          last_tweet_message = streams.home[index2]['message'];
-
-          if(last_tweet_index != null && last_tweet_message != last_displayed_message) { // to prevent re-displaying the same message 
-
-            // reset last_displayed_message to the new most recent message
-            last_displayed_message = last_tweet_message;  
-
-            while(index2 >= last_tweet_index) {
-              new_tweets.push(streams.home[index2])
-              index2--;
-            }
-
-          }  // End of last_tweet_index != null && last_tweet_message != last_displayed_message IF
-
-          return new_tweets;  // returns an array of objects with created_at, message, and user as properties.
-                              // array organized with most recent tweets first, so index 0 is most recent tweet
-
-        }  // End of newTweets function
-
-        */
-
+        //run timeago() on all "abbr.timeago" jQuery objects
+        $("abbr.timeago").timeago();
 
         var newTweets2 = function() {
 
@@ -163,16 +127,18 @@
               var index = tweetarray.length - 1;
               while(index >= 0) {
                 var tweet = tweetarray[index]; // tweet is object
+                var tweet_date = tweet['created_at'];
+                var utc_tweet = (tweet_date.getUTCMonth() + 1) + ' ' + tweet_date.getUTCDate() + ', ' + tweet_date.getUTCFullYear() + 'T' + tweet_date.getHours() + ':' + tweet_date.getUTCMinutes() + ':' + tweet_date.getUTCSeconds();
                 var $tweet = $('<div class="panel panel-default"></div>');
-                $tweet.html('<div class="panel-heading">@' + '<strong>' + tweet.user + '</strong> - ' +tweet.created_at + '</div>' + '<div class="panel-body tweet">' + tweet.message + '</div>');
+                $tweet.html('<div class="panel-heading">@' + '<strong>' + tweet.user + '</strong> - <abbr class="timeago" title="'+utc_tweet+'">' + utc_tweet + '</abbr></div>' + '<div class="panel-body tweet">' + tweet.message + '</div>');
                 $tweet.prependTo($tweets);
                 index--;
               } // end of while loop
             } // end of tweetarray.length > 0 IF
-           
+
+            $("abbr.timeago").timeago();           
+            
         }); // end of click(anonymous function)
-
-
 
       });  // End of $(document).ready(function)
 
