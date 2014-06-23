@@ -2,8 +2,44 @@
 
 body {
 	padding-top: 50px;
+	background-color: #C0DEED;
 }
 
 .content {
 	padding: 40px 15px;
 }
+
+.tweet-container {
+
+	background-color: white;
+    
+    /* Rounded Corners */
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+
+}
+
+.tweet {
+
+
+}
+
+.tweet:hover {
+	background-color: #f3f9fe;
+}
+
+.user {
+	background-color: white;
+
+	/* Rounded Corners */
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+
+	min-height: 200px;
+
+	margin-right: 10px;
+
+}
+
