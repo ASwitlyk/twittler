@@ -153,6 +153,7 @@
         var $body = $('body');
         var $tweets = $('#tweets');
         var $modalbody = $('#modal-body');
+        var $username = $('.user_name');
 
         var index = streams.home.length - 1,
             last_tweet_index = streams.home.length - 1; // for newtweet2 function  
@@ -210,12 +211,12 @@
               } // end of while loop
             } // end of tweetarray.length > 0 IF
 
-            $("abbr.timeago").timeago();           
+            $("abbr.timeago").timeago();        
             
         }); // end of click(anonymous function)
 
       //When user clicks on .user_name link, grab the data-username attribute, clear the modal content and then list all of the tweets into the modal content to show the timeline
-      $('.user_name').click(function() {
+      $(document).on('click', '.user_name', function() {
         $('#modal-body').html(''); //clear modal body html
         var username = $(this).attr('data-username');
         var tweetarray = streams.users[username];
@@ -231,6 +232,8 @@
                 index--;
               } // end of while loop
 
+        $('#myModalLabel').text(username);     
+
         // modify time to timeago format
         $("abbr.timeago").timeago();
 
@@ -238,12 +241,14 @@
 
         }
 
+      }); // end of $(document).on('click', '.user_name')
 
-      });
 
       });  // End of $(document).ready(function)
 
     </script>  
+
+
 
   </body>
 </html>
