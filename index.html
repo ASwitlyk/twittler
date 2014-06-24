@@ -13,6 +13,9 @@
     <!-- Data Generator Script -->
     <script src="data_generator.js"></script>
 
+      <!-- Bootstrap plugins -->
+    <script type="text/javascript" src="js/bootstrap.js"></script>
+
     <!-- Boot Strap CSS -->
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
 
@@ -21,6 +24,28 @@
 
   </head>
   <body>
+
+    <!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+      </div>
+      <div class="modal-body" id="modal-body">
+        ...
+      </div>
+      <!--
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    -->
+    </div>
+  </div>
+</div>
+
 
       <header class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 
@@ -50,10 +75,59 @@
         <div id="content" class="content">
 
           <div class="row">
-            <div class="col-md-3 user"><h2>User</h2>
+            <div class="col-md-3 user"><h2>Users</h2>
+              <select id="user_select" class="form-control">
+                <script type="text/javascript">
+                $(document).ready(function(){
+                  for(var i = 0; i < users.length; i++) {
+                    $('<option data-user="'+users[i]+'">' + users[i] + '</option>').appendTo('#user_select')
+                  }
+                });
+
+                </script>
+              </select>
+              <form>
+              <textarea id="tweet_message" style="margin-top: 5px" class="form-control" rows="3"></textarea>
+
+              <button type="submit" disabled="disabled" style="margin-top: 10px; margin-bottom: 10px" type="button" class="btn btn-default" id="newtweet">Submit Tweet</button>
+            </form>
+
+            <script type="text/javascript">
+
+            $(document).ready(function(){
+              var checktext = function(){
+                if($('#tweet_message').val() != ''){
+                  $('#newtweet').removeAttr("disabled");
+                }
+              }
+              $('#tweet_message').on({
+                click: checktext,
+                focus: checktext,
+                change: checktext
+              });
               
-              <abbr class="timeago" title="Jun 23, 2014T14:04:45">Jun 23, 2014T14:04:45</abbr>
-           
+              $('#newtweet').click(function(){
+               
+                var user = $("select option:selected").attr('data-user');
+                var created = new Date();
+                var tweet = $('#tweet_message').val();
+                var newtweet = {created_at: created, message: tweet, user: user};
+                addTweet(newtweet);
+                $('#tweet_message').val('');
+                $('.tweet-container').focus();
+                $('#newtweet').attr("disabled", "disabled");
+              });
+
+            });
+
+
+            </script>
+             <!-- Button trigger modal -->
+             <!--
+              <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+                    Launch demo modal
+              </button>
+            -->
             </div>
 
             <div class="col-md-6 tweet-container">
@@ -78,6 +152,7 @@
 
         var $body = $('body');
         var $tweets = $('#tweets');
+        var $modalbody = $('#modal-body');
 
         var index = streams.home.length - 1,
             last_tweet_index = streams.home.length - 1; // for newtweet2 function  
@@ -87,9 +162,9 @@
         while(index >= 0){
           var tweet = streams.home[index];
           var tweet_date = tweet['created_at'];
-          var utc_tweet = (tweet_date.getUTCMonth() + 1) + ' ' + tweet_date.getUTCDate() + ', ' + tweet_date.getUTCFullYear() + 'T' + tweet_date.getHours() + ':' + tweet_date.getUTCMinutes() + ':' + tweet_date.getUTCSeconds();
+          var utc_tweet = (tweet_date.getUTCMonth() + 1) + ' ' + tweet_date.getDate() + ', ' + tweet_date.getUTCFullYear() + 'T' + tweet_date.getHours() + ':' + tweet_date.getUTCMinutes() + ':' + tweet_date.getUTCSeconds();
           var $tweet = $('<div class="panel panel-default"></div>');
-          $tweet.html('<div class="panel-heading">@' + '<strong>' + tweet.user + '</strong> - <abbr class="timeago" title="'+utc_tweet+'">' + utc_tweet + '</abbr></div>' + '<div class="panel-body tweet">' + tweet.message + '</div>');
+          $tweet.html('<div class="panel-heading">@ <a href="#" class="user_name" data-username="'+ tweet.user +'"><strong>' + tweet.user + '</strong><a/> - <abbr class="timeago" title="'+utc_tweet+'">' + utc_tweet + '</abbr></div>' + '<div class="panel-body tweet">' + tweet.message + '</div>');
           $tweet.appendTo($tweets);
           index -= 1;
         }
@@ -122,15 +197,14 @@
         // When click newtweets button, fun newTweets function and get an array with all the new tweets and then display them
         $('#newtweets').click(function(){
           var tweetarray = newTweets2();
-          console.log(tweetarray);
           if(tweetarray.length > 0) {  // there are new tweets, tweetarray organized from newest tweets to oldest.
               var index = tweetarray.length - 1;
               while(index >= 0) {
                 var tweet = tweetarray[index]; // tweet is object
                 var tweet_date = tweet['created_at'];
-                var utc_tweet = (tweet_date.getUTCMonth() + 1) + ' ' + tweet_date.getUTCDate() + ', ' + tweet_date.getUTCFullYear() + 'T' + tweet_date.getHours() + ':' + tweet_date.getUTCMinutes() + ':' + tweet_date.getUTCSeconds();
+                var utc_tweet = (tweet_date.getUTCMonth() + 1) + ' ' + tweet_date.getDate() + ', ' + tweet_date.getUTCFullYear() + 'T' + tweet_date.getHours() + ':' + tweet_date.getUTCMinutes() + ':' + tweet_date.getUTCSeconds();
                 var $tweet = $('<div class="panel panel-default"></div>');
-                $tweet.html('<div class="panel-heading">@' + '<strong>' + tweet.user + '</strong> - <abbr class="timeago" title="'+utc_tweet+'">' + utc_tweet + '</abbr></div>' + '<div class="panel-body tweet">' + tweet.message + '</div>');
+                $tweet.html('<div class="panel-heading">@' + '<a href="#" class="user_name" data-username="'+tweet.user+'"><strong>' + tweet.user + '</strong></a> - <abbr class="timeago" title="'+utc_tweet+'">' + utc_tweet + '</abbr></div>' + '<div class="panel-body tweet">' + tweet.message + '</div>');
                 $tweet.prependTo($tweets);
                 index--;
               } // end of while loop
@@ -140,11 +214,36 @@
             
         }); // end of click(anonymous function)
 
+      //When user clicks on .user_name link, grab the data-username attribute, clear the modal content and then list all of the tweets into the modal content to show the timeline
+      $('.user_name').click(function() {
+        $('#modal-body').html(''); //clear modal body html
+        var username = $(this).attr('data-username');
+        var tweetarray = streams.users[username];
+        var index = tweetarray.length - 1;
+        if(index >= 0) {
+           while(index >= 0) {
+                var tweet = tweetarray[index]; // tweet is object
+                var tweet_date = tweet['created_at'];
+                var utc_tweet = (tweet_date.getUTCMonth() + 1) + ' ' + tweet_date.getDate() + ', ' + tweet_date.getUTCFullYear() + 'T' + tweet_date.getHours() + ':' + tweet_date.getUTCMinutes() + ':' + tweet_date.getUTCSeconds();
+                var $tweet = $('<div class="panel panel-default"></div>');
+                $tweet.html('<div class="panel-heading">@ <strong>' + tweet.user + '</strong> - <abbr class="timeago" title="'+utc_tweet+'">' + utc_tweet + '</abbr></div>' + '<div class="panel-body tweet">' + tweet.message + '</div>');
+                $tweet.appendTo($modalbody);
+                index--;
+              } // end of while loop
+
+        // modify time to timeago format
+        $("abbr.timeago").timeago();
+
+        $('#myModal').modal('toggle');
+
+        }
+
+
+      });
+
       });  // End of $(document).ready(function)
 
     </script>  
 
-    <!-- Bootstrap plugins -->
-    <script type="text/javascript" src="js/bootstrap.min.js"></script>
   </body>
 </html>
